@@ -1,22 +1,38 @@
+// ! https://vuejs.org/guide/essentials/reactivity-fundamentals.html#script-setup
+// https://vuejs.org/api/sfc-script-setup.html#script-setup
+// ! https://www.youtube.com/watch?v=yXrlRBouIHc
+// ! https://www.youtube.com/watch?v=gF0KYiCkAOE
 <script setup lang="ts">
+  // ! https://vuejs.org/api/reactivity-core.html#ref
+  // https://vuejs.org/api/reactivity-core.html
+  // ! https://www.youtube.com/watch?v=o8B4SguvUqk
   import { ref, computed, watch } from 'vue';
+
+  // https://axios-http.com/docs/intro
   import axios from 'axios';
   
+  // components importados já ficam disponíveis no template
   import CardPokemon from '../components/CardPokemon.vue'
   import PokeButton from '../components/PokeButton.vue'
   
-  
+  // typescript interface
+  // ! https://vuejs.org/guide/typescript/composition-api.html#typing-component-props
   interface Pokemon {
     name: string,
     url: string
   }
   
+  // component state variables
   const pokemonList = ref<Array<Pokemon>>([])
   
   const limit = ref(151)
   const page = ref(1)
   const offset = computed(() => limit.value * (page.value -1))
   
+  // computed pagination
+  // https://vuejs.org/guide/essentials/computed.html#computed-properties
+  // https://vuejs.org/api/reactivity-core.html#computed
+  // https://www.youtube.com/watch?v=mYKv-NZh03Q
   const pagination = computed(() => {
     let _limit= 151;
     let _offset =0;
@@ -37,19 +53,24 @@
       _offset = 494
     }
   
-  
     return `?limit=${_limit}&offset=${_offset}`
-  
   })
+
+  // methods
   async function getPokemonList () {
     const response = await axios.get(`/api/${pagination.value}`)
     pokemonList.value = response.data.results
   }
   
+  // "listener" - roda a arrow function toda vez que a variável limit ou page mudar
+  // https://vuejs.org/guide/essentials/watchers.html#basic-example
+  // https://vuejs.org/api/reactivity-core.html#watch
   watch([limit, page], () => {
     getPokemonList()
   })
   
+  // pegar lista de pokemons - seria melhor colocar isso dentro de um onMounted 
+  // https://vuejs.org/api/composition-api-lifecycle.html#onmounted
   getPokemonList()
   </script>
   
